@@ -9,6 +9,11 @@ const runGame = function ({ playerHand }) {
   // manipulate DOM
   const gameContainer = document.querySelector('#game-container');
 
+  let result;
+  if (currentGame.win !== undefined) {
+    result = currentGame.win ? 'You win!' : 'Keep going!';
+  }
+
   gameContainer.innerText = `
     Your Hand:
     ====
@@ -19,6 +24,8 @@ const runGame = function ({ playerHand }) {
     ${playerHand[1].name}
     of
     ${playerHand[1].suit}
+
+    ${result ?? ''}
   `;
 };
 

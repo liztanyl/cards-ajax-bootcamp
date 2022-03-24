@@ -88,6 +88,11 @@ const makeDeck = function () {
   return deck;
 };
 
+const getHighCard = function (hand) {
+  hand.sort((a, b) => b.rank - a.rank);
+  return hand[0];
+};
+
 /*
  * ========================================================
  * ========================================================
@@ -141,8 +146,12 @@ export default function initGamesController(db) {
       // get the game by the ID passed in the request
       const game = await db.Game.findByPk(request.params.id);
 
+      const prevHandHighCard = getHighCard(game.gameState?.playerHand);
+      console.log(prevHandHighCard);
+
       // make changes to the object
       const playerHand = [game.gameState.cardDeck.pop(), game.gameState.cardDeck.pop()];
+      const currentHighCard = getHighCard(playerHand);
 
       // update the game with the new info
       await game.update({
@@ -150,7 +159,6 @@ export default function initGamesController(db) {
           cardDeck: game.gameState.cardDeck,
           playerHand,
         },
-
       });
 
       // send the updated game back to the user.
@@ -158,6 +166,7 @@ export default function initGamesController(db) {
       response.send({
         id: game.id,
         playerHand: game.gameState.playerHand,
+        win: currentHighCard.rank > prevHandHighCard.rank ?? null,
       });
     } catch (error) {
       response.status(500).send(error);
